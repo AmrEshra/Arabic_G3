@@ -171,7 +171,8 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
 .qindex{position:fixed;top:0;bottom:0;right:0;width:340px;background:var(--card);border-inline-end:1px solid #DCE5EB;box-shadow:-2px 0 0 rgba(0,0,0,0);display:flex;flex-direction:column;z-index:15}
 .qi-head{padding:14px 14px 10px;border-bottom:1px solid #E6EDF2;display:grid;gap:10px;background:#FBFDFE}
 .qi-title{display:flex;justify-content:space-between;align-items:center;font-size:19px}
-.qi-close{display:none;width:36px;height:36px;border-radius:10px;border:2px solid #D7E2E9;font-size:18px}
+.qi-close{display:inline-flex;align-items:center;gap:4px;height:34px;padding:0 12px;border-radius:99px;border:2px solid #D7E2E9;font-size:14px;font-weight:700;background:#fff}
+.qi-close:hover{border-color:var(--ink)}
 .qi-search input{width:100%;font:inherit;font-size:16px;border:2px solid #D7E2E9;border-radius:12px;padding:7px 12px;background:#fff}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .qi-filters{display:flex;gap:6px}
@@ -202,15 +203,19 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
 .qi-open{display:none}
 .qi-shade{position:fixed;inset:0;background:rgba(15,25,45,.4);z-index:14}
 .browse-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+.qi-open{position:fixed;bottom:16px;right:16px;z-index:13;background:var(--ink);color:#fff;border-radius:99px;padding:10px 18px;font-weight:800;font-size:16px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 @media (min-width:1101px){
-  body{padding-right:340px}
+  body{padding-right:340px;transition:padding-right .25s}
+  .qindex{transition:transform .25s}
+  body.qi-hidden{padding-right:0}
+  body.qi-hidden .qindex{transform:translateX(105%)}
+  body.qi-hidden .qi-open{display:block}
   .qi-shade{display:none !important}
 }
 @media (max-width:1100px){
   .qindex{width:min(360px,88vw);transform:translateX(105%);transition:transform .25s;box-shadow:-8px 0 30px rgba(0,0,0,.2)}
   .qindex.on{transform:none}
-  .qi-close{display:grid;place-items:center}
-  .qi-open{display:block;position:fixed;bottom:16px;right:16px;z-index:13;background:var(--ink);color:#fff;border-radius:99px;padding:10px 18px;font-weight:800;font-size:16px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .qi-open{display:block}
   .qwrap,.wrap{padding-bottom:84px}
 }
 
@@ -389,7 +394,7 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
 <div class="qi-shade hidden" id="qiShade"></div>
 <aside class="qindex" id="qindex" aria-label="قائمة كل الأسئلة">
   <div class="qi-head">
-    <div class="qi-title"><b>📋 كل الأسئلة</b><button class="qi-close" id="qiClose" type="button" aria-label="إغلاق القائمة">✕</button></div>
+    <div class="qi-title"><b>📋 كل الأسئلة</b><button class="qi-close" id="qiClose" type="button" aria-label="إخفاء قائمة الأسئلة" title="إخفاء القائمة">إخفاء ✕</button></div>
     <label class="qi-search"><span class="sr">بحث في الأسئلة</span><input id="qiSearch" type="search" placeholder="ابحث في الأسئلة…" autocomplete="off"></label>
     <div class="qi-filters" role="group" aria-label="تصفية الأسئلة">
       <button type="button" data-f="all" aria-pressed="true">الكل</button>
@@ -756,8 +761,11 @@ function qiCurrent(sid,idx){
   el.scrollIntoView({block:"nearest"});
 }
 function qiToggle(on){ $("#qindex").classList.toggle("on",on); $("#qiShade").classList.toggle("hidden",!on); if(on) setTimeout(()=>$("#qiSearch").focus({preventScroll:true}),260); }
-$("#qiOpen").addEventListener("click", ()=>qiToggle(true));
-$("#qiClose").addEventListener("click", ()=>qiToggle(false));
+const wide = ()=>window.matchMedia("(min-width:1101px)").matches;
+function qiHide(h){ S.qiHidden=h; save(); document.body.classList.toggle("qi-hidden",h); setTimeout(()=>{ if(!$("#unit").classList.contains("hidden")) drawPath(); },280); }
+document.body.classList.toggle("qi-hidden", !!S.qiHidden);
+$("#qiOpen").addEventListener("click", ()=> wide()? qiHide(false) : qiToggle(true));
+$("#qiClose").addEventListener("click", ()=> wide()? qiHide(true) : qiToggle(false));
 $("#qiShade").addEventListener("click", ()=>qiToggle(false));
 document.addEventListener("keydown", e=>{ if(e.key==="Escape") qiToggle(false); });
 $("#qiSearch").addEventListener("input", buildIndex);

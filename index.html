@@ -54,6 +54,7 @@ h1,h2,h3{margin:0;line-height:1.25;text-wrap:balance}
 .total b{font-size:34px;line-height:1;color:#B97A12}
 .total span{font-size:14px;color:var(--muted)}
 
+.part-h{grid-column:1/-1;font-size:20px;margin:10px 0 0;color:var(--muted)}
 .units{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:6px}
 .unit-card{position:relative;text-align:right;border-radius:22px;overflow:hidden;background:var(--card);box-shadow:0 2px 0 rgba(29,43,69,.06),0 8px 22px rgba(29,43,69,.07);display:grid;grid-template-rows:auto 1fr;transition:transform .15s}
 .unit-card:hover{transform:translateY(-3px)}
@@ -342,7 +343,7 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
   <header class="hero">
     <div class="hero-in">
       <div>
-        <div class="logo">لُغَتي<small>رحلتي في الصف الثالث الابتدائي · الجزء الأول</small></div>
+        <div class="logo">لُغَتي<small>رحلتي في الصف الثالث الابتدائي · الجزءان الأول والثاني</small></div>
         <div class="hello"><span id="helloText">مرحبًا!</span><button class="linkbtn" id="editName" type="button">تغيير الاسم أو ولد/بنت</button></div>
       </div>
       <div class="total" aria-label="مجموع النجوم"><b id="totalStars">٠</b><span id="totalOf">نجمة من ٦٠</span></div>
@@ -470,6 +471,8 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
 const $ = s => document.querySelector(s);
 const AR = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
 const LETTERS = ["أ","ب","ج","د"];
+const BOOK = part => part===2 ? "كتاب لغتي (الجزء الثاني)" : "كتاب لغتي (الجزء الأول)";
+const unitOf = sid => UNITS.find(u=>u.stations.some(s=>s.id===sid));
 const G = (m,f) => (S.gender==="m" ? m : f);
 const T = str => String(str).replace(/\{ي\}/g, S.gender==="m" ? "" : "ي");
 
@@ -546,9 +549,10 @@ function renderHome(){
   const max = UNITS.reduce((t,u)=>t+unitMax(u),0);
   $("#totalStars").textContent = AR(total);
   $("#totalOf").textContent = `نجمة من ${AR(max)}`;
-  $("#unitGrid").innerHTML = UNITS.map(u=>{
+  $("#unitGrid").innerHTML = UNITS.map((u,ix)=>{
     const d = unitDone(u), n=u.stations.length;
-    return `<button class="unit-card" type="button" data-unit="${u.id}" style="--uc:${u.color}">
+    const head = (ix===0 || (UNITS[ix-1].part||1)!==(u.part||1)) ? `<h3 class="part-h">📘 ${(u.part||1)===2?"الجزء الثاني":"الجزء الأول"}</h3>` : "";
+    return head + `<button class="unit-card" type="button" data-unit="${u.id}" style="--uc:${u.color}">
       <div class="unit-top"><div class="unit-num">الوحدة ${["","الأولى","الثانية","الثالثة","الرابعة","الخامسة","السادسة","السابعة","الثامنة"][u.id]}</div><div class="unit-title">${u.title}</div>${u.cover?`<img class="unit-cover" src="${u.cover}" alt="" loading="lazy">`:""}</div>
       <div class="unit-body">
         <div class="meter" aria-hidden="true"><i style="width:${d/n*100}%"></i></div>
@@ -657,7 +661,7 @@ function renderQ(){
   qiCurrent(item.sid, item.idx);
   const st = (item.u||Q.unit).stations.find(s=>s.id===item.sid);
   const pic = q.img ? `<img class="qimg" src="${q.img}" alt="صورة من كتاب لغتي">` : "";
-  const head = pic + `<div class="qhead"><span class="tag">${Q.review?'مراجعة · ':''}${st.title}</span><span class="page-ref">كتاب لغتي · صفحة ${AR(q.p)}</span></div>`;
+  const head = pic + `<div class="qhead"><span class="tag">${Q.review?'مراجعة · ':''}${st.title}</span><span class="page-ref">${BOOK(unitOf(item.sid).part)} · صفحة ${AR(q.p)}</span></div>`;
   let body="";
   if(q.t==="mcq"){
     const order = shuffle(q.o.map((t,k)=>k));
@@ -716,7 +720,7 @@ function finish(ok){
   S.wrong[item.sid]=[...arr]; S.ans[item.sid+"-"+item.idx]=ok; save(); qiMark(item.sid, item.idx);
   const pick = a=>a[Math.floor(Math.random()*a.length)];
   const last = Q.i===Q.list.length-1;
-  $("#fb").innerHTML = `<div class="feedback ${ok?'good':'bad'}" role="status"><b>${ok?pick(PRAISE()):pick(TRY())}</b><p>${q.e}</p><span class="src">📖 ${G("راجع","راجعي")} كتاب لغتي صفحة ${AR(q.p)}</span></div>
+  $("#fb").innerHTML = `<div class="feedback ${ok?'good':'bad'}" role="status"><b>${ok?pick(PRAISE()):pick(TRY())}</b><p>${q.e}</p><span class="src">📖 ${G("راجع","راجعي")} ${BOOK(unitOf(item.sid).part)} صفحة ${AR(q.p)}</span></div>
     ${Q.browse? "" : `<div class="next-row"><button class="btn" id="nextBtn" type="button">${last?'عرض النتيجة':'السؤال التالي ←'}</button></div>`}`;
   $("#qbar").style.width = ((Q.i+1)/Q.list.length*100)+"%";
   setTimeout(()=>{ const n=$("#nextBtn"); if(n){ n.focus({preventScroll:true}); n.scrollIntoView({block:"nearest",behavior:"smooth"}); } },60);
@@ -803,7 +807,7 @@ function renderLearn(){
   exStop();
   const id=L.list[L.idx], ex=EXPLAIN[id], st=L.u.stations[L.i];
   $("#exCount").textContent=`${AR(L.idx+1)} / ${AR(L.list.length)}`;
-  $("#exTitle").textContent=ex.t; $("#exPage").textContent=`كتاب لغتي · صفحة ${AR(ex.p)}`;
+  $("#exTitle").textContent=ex.t; $("#exPage").textContent=`${BOOK(ex.part)} · صفحة ${AR(ex.p)}`;
   const stage=$("#exStage"); stage.innerHTML=ex.html; $("#exCap").textContent=ex.cap||"";
   const h=exHelpers(stage,ex); L.h=h;
   $("#exBtns").innerHTML=(ex.btns||[]).map(([lab,fn])=>`<button type="button" data-fn="${fn}">${lab}</button>`).join("")+`<button type="button" data-fn="__replay">↻ ${G("أعد","أعيدي")} الشرح</button>`;

@@ -331,3 +331,241 @@ fa3il: {
   }
 }
 };
+
+// ======================================================================
+// الجزء الثاني (الوحدات ٥ – ٨)
+// ======================================================================
+Object.assign(EXPLAIN_FOR, {
+  "5-3": ["hasana"],
+  "5-4": ["qasam", "zaman"],
+  "6-2": ["jobs"],
+  "6-3": ["shart"],
+  "6-4": ["mubalagha"],
+  "7-2": ["paper"],
+  "7-3": ["meat"],
+  "7-4": ["yaa"],
+  "8-2": ["sea"],
+  "8-3": ["clean"],
+  "8-4": ["amr"]
+});
+
+Object.assign(EXPLAIN, {
+
+hasana: {
+  t: "كل درهم بعشر حسنات", p: 44, part: 2,
+  cap: "عرض التجار على عثمان ربحًا… لكن الله أعطاه أكثر",
+  html: `<div class="ex-center" style="background:#ECEEFB">
+    <div id="xCoin" style="width:86px;height:86px;border-radius:50%;background:#F2B866;border:5px solid #C9902F;display:grid;place-items:center;font-weight:800;color:#7A4E12;font-size:18px">درهم</div>
+    <div id="xStars" style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:300px;margin-top:10px;min-height:40px"></div>
+    <div id="xCount" class="ex-big" style="color:#3F4FA6;opacity:0">١٠ حسنات!</div></div>`,
+  play(h){
+    const offers=[["التجار: على الدرهم درهمين","٢"],["التجار: نعطيك أربعة","٤"],["التجار: نربحك خمسة","٥"]];
+    offers.forEach(([t,n],i)=>h.later(()=>{ h.cap(t); const c=h.q("#xCoin"); c.textContent=n+" دراهم"; h.move(c,[{transform:"scale(1)"},{transform:"scale(1.15)"},{transform:"scale(1)"}],400); h.tone([[440+i*60,.1]]); },300+i*1300));
+    h.later(()=>{ h.cap("عثمان: إن الله أعطاني بكل درهم عشر حسنات ✨"); h.q("#xCoin").textContent="درهم"; const box=h.q("#xStars"); box.innerHTML="";
+      for(let i=0;i<10;i++){ const s=document.createElement("span"); s.textContent="⭐"; s.style.fontSize="26px"; box.appendChild(s); h.pop(s,i*160); h.later(()=>h.tone([[600+i*40,.06]]),i*160); }
+      h.pop(h.q("#xCount"),1800); }, 4300);
+    h.later(()=>h.cap("فجعلها صدقة للمساكين وفقراء المسلمين 💛"), 6600);
+  }
+},
+
+qasam: {
+  t: "أسلوب القسم", p: 38, part: 2,
+  cap: "نؤكّد كلامنا بالقسم بالله",
+  html: `<div class="ex-center" style="background:#ECEEFB">
+    <div class="ex-big" id="xPlain">أساعدُ المحتاجين.</div>
+    <div class="ex-big" id="xOath" style="opacity:0"><span style="color:#D64545">واللهِ</span> <span style="color:#3F4FA6">لَ</span>أساعدَ<span style="color:#3F4FA6">نَّ</span> المحتاجين.</div>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;justify-content:center"><span class="ex-chip" id="xC1" style="background:#D64545">واللهِ: القسم</span><span class="ex-chip" id="xC2" style="background:#3F4FA6">لَـ … ـنَّ: للتأكيد</span></div></div>`,
+  btns: [["مثال آخر","next"]],
+  play(h){ h.state.k=-1; h.run("next"); },
+  next(h){
+    const ex=[["أساعدُ المحتاجين.","أساعدَ","المحتاجين"],["أرحمُ الفقراء.","أرحمَ","الفقراء"],["أعملُ الخير.","أعملَ","الخير"]];
+    h.state.k=((h.state.k??-1)+1)%ex.length; const [a,v,o]=ex[h.state.k];
+    h.q("#xPlain").textContent=a; h.pop(h.q("#xPlain"),100);
+    h.q("#xOath").innerHTML=`<span style="color:#D64545">واللهِ</span> <span style="color:#3F4FA6">لَ</span>${v}<span style="color:#3F4FA6">نَّ</span> ${o}.`;
+    h.pop(h.q("#xOath"),1100); h.pop(h.q("#xC1"),1500); h.pop(h.q("#xC2"),1800);
+    h.later(()=>h.tone([[520,.1],[700,.15]]),1100); h.cap("الجملة الثانية مؤكّدة بالقسم");
+  }
+},
+
+zaman: {
+  t: "اسم الزمان واسم المكان", p: 38, part: 2,
+  cap: "من الفعل نصنع اسمًا يدل على الزمان أو المكان",
+  html: `<div class="ex-sky" style="background:linear-gradient(#FFE9C7,#ECEEFB)">
+    <div style="position:absolute;bottom:0;left:0;right:0;height:56px;background:#E6D6C3"></div>
+    <div id="xSun" style="position:absolute;bottom:50px;right:8%;font-size:46px">☀️</div>
+    <div id="xE" class="ex-chip" style="position:absolute;bottom:14px;right:6%;background:#C25E12">شَرَقَ ← مَشْرِق</div>
+    <div id="xW" class="ex-chip" style="position:absolute;bottom:14px;left:6%;background:#3F4FA6">غَرَبَ ← مَغْرِب</div>
+    <div id="xM" class="ex-chip" style="position:absolute;top:12px;left:50%;transform:translateX(-50%);background:#2E9A6B">جَلَسَ ← مَجْلِس (مكان)</div></div>`,
+  play(h){
+    const W=h.stage.clientWidth-90;
+    h.pop(h.q("#xE"),200); h.later(()=>h.tone([[500,.1]]),200);
+    h.move(h.q("#xSun"),[{transform:"translate(0,0)"},{transform:`translate(${-W/2}px,-120px)`},{transform:`translate(${-W}px,0)`}],3600,600);
+    h.pop(h.q("#xW"),4200); h.later(()=>{ h.tone([[400,.12]]); h.cap("مَغرِب الشمس: زمن غروبها. ومثلها: وعد ← مَوعِد"); },4200);
+    h.pop(h.q("#xM"),5600); h.later(()=>{ h.tone([[620,.1]]); h.cap("ومن المكان: جلس ← مَجلِس، خزن ← مَخزَن"); },5600);
+  }
+},
+
+jobs: {
+  t: "مهن الأنبياء عليهم السلام", p: 74, part: 2,
+  cap: "كل نبي كان يعمل بيده في مهنة",
+  html: `<div class="ex-center" style="background:#E2F3EA"><div id="xGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:94%"></div></div>`,
+  play(h){
+    const J=[["آدم","🌾","حرّاث"],["إدريس","🧵","خيّاط"],["نوح","🪵","نجّار"],["صالح","🛍️","تاجر"],["موسى","🐑","راعٍ"],["داود","⚒️","حدّاد"]];
+    const g=h.q("#xGrid");
+    g.innerHTML=J.map(([n,e,j],i)=>`<div id="xJ${i}" style="background:#fff;border-radius:14px;padding:6px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.08)"><div style="font-size:30px;line-height:1.2">${e}</div><div style="font-weight:800;font-size:15px">${n}</div><div style="color:#1E7049;font-weight:800;font-size:15px">${j}</div></div>`).join("");
+    J.forEach(([n,,j],i)=>{ h.pop(h.q("#xJ"+i),300+i*800); h.later(()=>{ h.cap(`${n} عليه السلام كان ${j}`); h.tone([[480+i*50,.1]]); },300+i*800); });
+    h.later(()=>h.cap("وكان نبيّنا محمد ﷺ راعيًا يرعى غنم قريش"),300+J.length*800+400);
+  }
+},
+
+shart: {
+  t: "أسلوب الشرط: مَن زرع حصد", p: 98, part: 2,
+  cap: "الشرط: إذا حدث الأول حدث الثاني",
+  html: `<div class="ex-sky" style="background:#E2F3EA">
+    <div style="position:absolute;bottom:0;left:0;right:0;height:44px;background:#B98B5E"></div>
+    <div id="xPlant" style="position:absolute;bottom:34px;left:50%;transform:translateX(-50%);font-size:54px">🌰</div>
+    <div style="position:absolute;top:14px;left:0;right:0;display:flex;justify-content:center;gap:10px;align-items:center">
+      <span class="ex-chip" id="xS1" style="background:#2E9A6B;font-size:20px">مَن زرع</span><span style="font-size:22px" id="xArrow">←</span><span class="ex-chip" id="xS2" style="background:#C25E12;font-size:20px">حصد</span></div></div>`,
+  btns: [["مثال آخر","next"]],
+  play(h){
+    h.pop(h.q("#xS1"),200); h.later(()=>h.cap("الشرط: مَن زرع…"),200);
+    const p=h.q("#xPlant");
+    h.later(()=>{ p.textContent="🌱"; h.pop(p,0); h.tone([[500,.1]]); },1300);
+    h.later(()=>{ p.textContent="🌿"; h.pop(p,0); h.tone([[600,.1]]); },2300);
+    h.later(()=>{ p.textContent="🌾"; h.pop(p,0); h.tone([[700,.1],[900,.15]]); },3300);
+    h.pop(h.q("#xArrow"),3600); h.pop(h.q("#xS2"),3900);
+    h.later(()=>h.cap("جواب الشرط: حصد. ومثلها: مَن جدّ وجد"),3900);
+  },
+  next(h){
+    const ex=[["مَن جدّ","وجد","مَن جدّ وجد 💪"],["مَن يُخلِصْ","يُؤجَرْ","مَن يخلص يؤجر 🤲"],["إنْ تذاكرْ","تنجحْ","إن تذاكر دروسك تنجح 📚"],["مَن زرع","حصد","مَن زرع حصد 🌾"]];
+    h.state.k=((h.state.k??-1)+1)%ex.length; const [a,b,c]=ex[h.state.k];
+    h.q("#xS1").textContent=a; h.q("#xS2").textContent=b; h.pop(h.q("#xS1"),0); h.pop(h.q("#xS2"),600); h.cap(c); h.tone([[560,.1]]);
+  }
+},
+
+mubalagha: {
+  t: "صيغة المبالغة: فعّال", p: 84, part: 2,
+  cap: "نصف من يُكثر من العمل على وزن «فعّال»",
+  html: `<div class="ex-center" style="background:#E2F3EA">
+    <div id="xEm" style="font-size:56px;line-height:1.2">🚜</div>
+    <div style="display:flex;gap:14px;align-items:center"><div id="xV" class="ex-big">حرثَ</div><div class="ex-big">←</div><div id="xM" class="ex-big" style="color:#1E7049">حرّاث</div></div>
+    <div id="xNote" class="ex-chip" style="background:#1E7049">كثير الحرث</div></div>`,
+  btns: [["مثال آخر","next"]],
+  play(h){ h.state.k=-1; h.run("next"); },
+  next(h){
+    const ex=[["حرثَ","حرّاث","🚜","كثير الحرث"],["زرعَ","زرّاع","🌱","كثير الزراعة"],["خبزَ","خبّاز","🥖","يخبز الخبز كثيرًا"],["نجرَ","نجّار","🪚","يصنع الأبواب والكراسي"],["غفرَ","غفّار","🤲","الله الغفّار: كثير المغفرة"]];
+    h.state.k=((h.state.k??-1)+1)%ex.length; const [v,m,e,n]=ex[h.state.k];
+    h.q("#xV").textContent=v; h.q("#xM").textContent=m; h.q("#xEm").textContent=e; h.q("#xNote").textContent=n;
+    h.pop(h.q("#xV"),100); h.pop(h.q("#xEm"),600); h.pop(h.q("#xM"),900); h.pop(h.q("#xNote"),1300);
+    h.later(()=>h.tone([[600,.08],[800,.12]]),900); h.cap(`${v} ← ${m}: الحرف الأوسط مشدّد، وبعده ألف`);
+  }
+},
+
+paper: {
+  t: "ورق جابر المقاوم للنار", p: 123, part: 2,
+  cap: "ألقى جابر نسخة الكتاب في موقد النار…",
+  html: `<div class="ex-center" style="background:#FBEBE3">
+    <div id="xBook" style="font-size:58px;line-height:1">📕</div>
+    <div id="xFire" style="font-size:64px;line-height:1;margin-top:6px">🔥</div>
+    <div id="xOk" class="ex-chip" style="background:#2E9E5B;font-size:18px;opacity:0">خرج الكتاب سليمًا ✨</div></div>`,
+  play(h){
+    h.move(h.q("#xBook"),[{transform:"translateY(0) rotate(0)"},{transform:"translateY(70px) rotate(25deg)"}],900,400,"ease-in");
+    h.later(()=>{ h.cap("صرخ الحاضرون مستنكرين: الكتاب سيحترق!"); h.tone([[300,.15]]); h.move(h.q("#xFire"),[{transform:"scale(1)"},{transform:"scale(1.35)"},{transform:"scale(1)"}],600,0,"ease-in-out",3); },1300);
+    h.later(()=>{ h.move(h.q("#xBook"),[{transform:"translateY(70px) rotate(25deg)"},{transform:"translateY(0) rotate(0)"}],900); h.cap("لكن جابرًا أخرجه من النار سليمًا، كأن النار لم تمسسه!"); },3200);
+    h.pop(h.q("#xOk"),4200); h.later(()=>h.tone([[523,.1],[659,.1],[784,.25]]),4200);
+    h.later(()=>h.cap("لأنه اخترع ورقًا لا تؤثر فيه النار 🔬"),5400);
+  }
+},
+
+meat: {
+  t: "كيف اختار الرازي مكان المستشفى؟", p: 136, part: 2,
+  cap: "علّق الرازي قطع لحم في نواحي بغداد…",
+  html: `<div class="ex-center" style="background:#FBEBE3;flex-direction:row;gap:22px">
+    ${[0,1,2].map(i=>`<div class="ex-col"><div style="font-size:28px">🪝</div><div id="xMeat${i}" style="font-size:46px;line-height:1.1">🥩</div><div class="ex-sm" style="font-weight:700">${["الناحية الأولى","الناحية الثانية","الناحية الثالثة"][i]}</div><div id="xR${i}" class="ex-chip" style="opacity:0;background:${i===1?"#2E9E5B":"#D64545"}">${i===1?"لم تفسد ✓":"فسدت ✗"}</div></div>`).join("")}</div>`,
+  play(h){
+    [0,1,2].forEach(i=>h.pop(h.q("#xMeat"+i),300+i*300));
+    h.later(()=>h.cap("انتظر الرازي ليرى ما يحدث لقطع اللحم…"),1400);
+    h.later(()=>{ [0,2].forEach(i=>{ h.q("#xMeat"+i).textContent="🦠"; h.pop(h.q("#xMeat"+i),0); h.pop(h.q("#xR"+i),300); }); h.tone([[280,.15]]); h.cap("قطعتان فسدتا بسرعة: الهواء هناك غير صالح"); },3000);
+    h.later(()=>{ h.pop(h.q("#xR1"),0); h.tone([[600,.1],[800,.15]]); h.cap("وقطعة لم تفسد: هواؤها طيّب خالٍ من الملوّثات"); },4600);
+    h.later(()=>{ const m=h.q("#xMeat1"); m.textContent="🏥"; h.pop(m,0); h.tone([[523,.1],[659,.1],[784,.25]]); h.cap("فبنى المستشفى هناك! 🏥"); },6200);
+  }
+},
+
+yaa: {
+  t: "الياء (ي) والألف المقصورة (ى)", p: 127, part: 2,
+  cap: "انظر إلى النقطتين تحت آخر الكلمة",
+  html: `<div class="ex-center" style="background:#FBEBE3;flex-direction:row;gap:clamp(24px,8vw,52px)">
+    <div class="ex-col"><div class="ex-huge" id="xA1">فِي</div><div id="xD1" style="font-size:22px;color:#13679C;letter-spacing:6px">● ●</div><div class="ex-chip" id="xL1" style="background:#13679C">ياء: لها نقطتان</div></div>
+    <div class="ex-col"><div class="ex-huge" id="xA2">عَلَى</div><div id="xD2" style="font-size:22px;color:#B4553A">بلا نقاط</div><div class="ex-chip" id="xL2" style="background:#B4553A">ألف مقصورة: ى</div></div></div>`,
+  btns: [["مثال آخر","next"]],
+  play(h){ h.state.k=-1; h.run("next"); },
+  next(h){
+    const ex=[["فِي","عَلَى"],["الرازي","إلى"],["الذي","حتى"],["الكوفي","مستشفى"]];
+    h.state.k=((h.state.k??-1)+1)%ex.length; const [a,b]=ex[h.state.k];
+    h.q("#xA1").textContent=a; h.q("#xA2").textContent=b;
+    h.pop(h.q("#xA1"),100); h.pop(h.q("#xD1"),600); h.pop(h.q("#xL1"),900);
+    h.pop(h.q("#xA2"),1500); h.pop(h.q("#xD2"),2000); h.pop(h.q("#xL2"),2300);
+    h.later(()=>h.tone([[600,.1]]),600); h.later(()=>h.tone([[450,.1]]),2000);
+    h.cap(`${a}: ياء ـــ ${b}: ألف مقصورة`);
+  }
+},
+
+sea: {
+  t: "عجائب الأحياء البحرية", p: 169, part: 2,
+  cap: "تعيش في البحار كائنات حية كثيرة…",
+  html: `<div class="ex-center" style="background:linear-gradient(#BFE7F5,#0E86AE)">
+    <div id="xFish" style="font-size:80px;line-height:1.1"></div>
+    <div id="xFact" class="ex-chip" style="background:#0A5F7C;font-size:18px;margin-top:8px;max-width:92%;text-align:center"></div>
+    <div style="position:absolute;bottom:6px;left:12px;font-size:20px;opacity:.6">🫧</div><div style="position:absolute;bottom:40px;right:18px;font-size:16px;opacity:.6">🫧</div></div>`,
+  play(h){
+    const F=[["🐢","السلحفاة: تعيش أكثر من مئة سنة"],["🐙","الأخطبوط: ٣ قلوب و٨ أذرع، ويغيّر لونه"],["⭐","نجم البحر: له خمس أذرع"],["🦀","سرطان البحر: يُعرف بـ«أبو مقص»"],["🐬","الدلفين: صديق الإنسان"],["🪸","المرجان: يكثر في البحر الأحمر"]];
+    F.forEach(([e,f],i)=>h.later(()=>{
+      const x=h.q("#xFish"), t=h.q("#xFact"); x.textContent=e; t.textContent=f;
+      h.move(x,[{transform:"translateX(-160px)",opacity:0},{transform:"translateX(0)",opacity:1}],700); h.pop(t,500);
+      h.tone([[500+i*50,.1]]); h.cap(f);
+    }, 300+i*1900));
+    h.later(()=>h.cap("فما أعظم قدرة الله تعالى! 🌊"),300+F.length*1900);
+  }
+},
+
+clean: {
+  t: "لنحافظ على نظافة الشاطئ", p: 182, part: 2,
+  cap: "رأى خالد نفايات ملقاة على الشاطئ…",
+  html: `<div class="ex-sky" style="background:#BFE7F5">
+    <div id="xSea" style="position:absolute;top:0;left:0;right:0;height:46%;background:#5D7E70;transition:background 1.2s"></div>
+    <div style="position:absolute;top:46%;left:0;right:0;bottom:0;background:#F1DDB0"></div>
+    ${[["🥤",14,62],["🛍️",34,74],["🍾",56,64],["🥫",74,78],["🧃",88,66]].map(([e,x,y],i)=>`<div class="trash" id="xT${i}" style="position:absolute;left:${x}%;top:${y}%;font-size:28px">${e}</div>`).join("")}
+    <div id="xBin" style="position:absolute;right:4%;top:56%;font-size:46px">🗑️</div>
+    <div id="xOk" class="ex-chip" style="position:absolute;top:14px;left:50%;transform:translateX(-50%);background:#2E9E5B;opacity:0">شاطئ نظيف 🌊</div></div>`,
+  play(h){
+    h.later(()=>{ h.cap("خالد: ما أقبح هذا المنظر يا أبي!"); h.tone([[300,.15]]); },400);
+    h.later(()=>h.cap("الأب: الشواطئ ملك للجميع، فعلينا المحافظة عليها"),2000);
+    const bin=h.q("#xBin").getBoundingClientRect(), st=h.stage.getBoundingClientRect();
+    for(let i=0;i<5;i++) h.later(()=>{
+      const t=h.q("#xT"+i), r=t.getBoundingClientRect();
+      const dx=(bin.left-st.left+10)-(r.left-st.left), dy=(bin.top-st.top+8)-(r.top-st.top);
+      h.move(t,[{transform:"translate(0,0) scale(1)",opacity:1},{transform:`translate(${dx}px,${dy}px) scale(.3)`,opacity:0}],700); h.tone([[520+i*60,.08]]);
+    },3600+i*500);
+    h.later(()=>{ h.q("#xSea").style.background="#2AA8D8"; h.pop(h.q("#xOk"),0); h.tone([[523,.1],[659,.1],[784,.25]]); h.cap("نضع النفايات في الحاويات؛ كي لا يتلوّث البحر 💙"); },6400);
+  }
+},
+
+amr: {
+  t: "من المضارع إلى الأمر", p: 192, part: 2,
+  cap: "نحذف حرف المضارعة ونطلب الفعل",
+  html: `<div class="ex-center" style="background:#E0F2F8">
+    <div style="display:flex;gap:16px;align-items:center"><div class="ex-col"><div id="xU" class="ex-big">يتأمّلُ</div><div class="ex-chip" style="background:#5E6B82">مضارع</div></div>
+    <div class="ex-big">←</div>
+    <div class="ex-col"><div id="xA" class="ex-big" style="color:#0A5F7C">تأمّلْ</div><div class="ex-chip" id="xAl" style="background:#0A5F7C">أمر</div></div></div>
+    <div id="xS" class="ex-mid" style="margin-top:10px"></div></div>`,
+  btns: [["مثال آخر","next"]],
+  play(h){ h.state.k=-1; h.run("next"); },
+  next(h){
+    const ex=[["يتأمّلُ","تأمّلْ","تأمّلِ البحرَ وجمالَه 🌊"],["ينظرُ","انظرْ","انظرْ إلى الأمواج"],["يحرصُ","احرصْ","احرصْ على نظافة الشاطئ"],["يرتّبُ","رتّبْ","رتّبْ كتبَك"]];
+    h.state.k=((h.state.k??-1)+1)%ex.length; const [u,a,s]=ex[h.state.k];
+    h.q("#xU").textContent=u; h.q("#xA").textContent=a; h.q("#xS").textContent=s;
+    h.pop(h.q("#xU"),100); h.pop(h.q("#xA"),900); h.pop(h.q("#xAl"),1100); h.pop(h.q("#xS"),1600);
+    h.later(()=>h.tone([[600,.08],[800,.12]]),900); h.cap(`${u} ← ${a}`);
+  }
+}
+});

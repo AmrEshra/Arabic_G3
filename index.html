@@ -232,6 +232,8 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
 .qi-q .mk.no{background:var(--bad);border-color:var(--bad);color:#fff}
 .qi-game{display:flex;gap:8px;align-items:center;width:100%;text-align:right;padding:6px 8px;border-radius:10px;font-size:15px;font-weight:700}
 .qi-game:hover{background:#FFF4E5}
+.qi-game[data-learn]{background:#FFF4E5;border:2px solid #F2B866;color:#B5520F;margin:4px 0 6px;justify-content:center}
+.qi-game[data-learn]:hover{background:#FFE9CC;border-color:#F06331}
 .qi-empty{color:var(--muted);text-align:center;padding:20px 8px;font-size:15px}
 .qi-open{display:none}
 .qi-shade{position:fixed;inset:0;background:rgba(15,25,45,.4);z-index:14}
@@ -841,7 +843,7 @@ function buildIndex(){
         return `<button class="qi-q" type="button" data-sid="${st.id}" data-idx="${idx}"><span class="mk ${status}">${status==="ok"?"✓":status==="no"?"✗":""}</span><span class="n">${AR(idx+1)}</span><span class="t">${q.img?"🖼️ ":""}${text}</span></button>`;
       }).join("");
       if(!rows) return "";
-      const exs=(EXPLAIN_FOR[st.id]||[]); const exRow = (exs.length && !term && qiFilter==="all") ? `<button class="qi-game" type="button" data-learn="${st.id}">🎬 شاهد وتعلّم (${AR(exs.length)})</button>` : "";
+      const exs=(EXPLAIN_FOR[st.id]||[]); const exRow = (exs.length && !term && qiFilter==="all") ? `<button class="qi-game" type="button" data-learn="${st.id}">🎬 ${G("اضغط","اضغطي")} هنا: شاهد وتعلّم (${AR(exs.length)} شرح متحرك)</button>` : "";
       return `<details class="qi-st" ${term||qiFilter!=="all"?"open":""}><summary>${st.title}<span class="cnt">${AR(st.qs.length)}</span></summary>${exRow}${rows}</details>`;
     }).join("");
     const games = (!term && qiFilter==="all" && GAMES[u.id]) ? `<details class="qi-st"><summary>🎮 ألعاب الوحدة<span class="cnt">${AR(GAME_LIST.length)}</span></summary>${GAME_LIST.map(([k,name])=>`<button class="qi-game" type="button" data-unit="${u.id}" data-game="${k}">${GI[k]} ${name}</button>`).join("")}</details>` : "";

@@ -167,6 +167,39 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
 .home-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .home-tools button{font-size:14px;color:var(--muted);border:1.5px solid #D7E2E9;border-radius:99px;padding:4px 12px;background:var(--card)}
 
+/* watch and learn */
+.ex-stage{position:relative;height:250px;border-radius:18px;overflow:hidden;background:#F3F8FA}
+.ex-stage > div{position:absolute;inset:0}
+.ex-center{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ex-huge{font-family:var(--read);font-weight:700;font-size:clamp(50px,12vw,74px);line-height:1.45}
+.ex-big{font-family:var(--read);font-weight:700;font-size:clamp(28px,7vw,40px);line-height:1.5}
+.ex-mid{font-family:var(--read);font-weight:700;font-size:clamp(18px,4.6vw,24px);line-height:1.6}
+.ex-sm{font-size:13px;color:var(--muted);line-height:1.4}
+.ex-col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.ex-chip{display:inline-block;color:#fff;border-radius:99px;padding:2px 12px;font-weight:800;font-size:15px;line-height:1.6}
+.ex-cap{font-family:var(--read);font-size:clamp(18px,4.4vw,22px);font-weight:700;text-align:center;color:var(--u-deep);min-height:2.4em;margin:12px 0 6px;line-height:1.6}
+.ex-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.ex-btns button{border:2px solid var(--u);color:var(--u-deep);background:#fff;border-radius:99px;padding:6px 16px;font-weight:800;font-size:16px}
+.ex-btns button:hover{background:var(--u-soft)}
+.ex-badge{display:inline-block;margin-top:2px;background:#FFF4E5;color:#B5520F;border-radius:99px;padding:0 8px;font-size:13px;font-weight:700}
+.cloud{position:absolute;font-size:34px;opacity:.85}
+.seat-wrap{display:flex;flex-direction:column;align-items:center}
+.seat{width:48px;height:18px;border-radius:6px 6px 2px 2px;background:#2590CC;margin-top:-14px}
+.pp{position:relative;z-index:1}
+.ex-glow{filter:drop-shadow(0 0 8px #F06331)}
+.ex-line{position:relative;width:82%;height:6px;background:#2FA5A8;border-radius:99px;margin-top:10px}
+.ex-dot{position:absolute;top:-6px;width:18px;height:18px;border-radius:50%;background:#fff;border:4px solid #2FA5A8}
+.date{position:absolute;top:44px;width:26px;height:16px;border-radius:50%;background:#7A4A22;box-shadow:inset -3px -3px 0 #5A3416}
+.date.half{width:13px;border-radius:50% 0 0 50%}
+.date.half.r{border-radius:0 50% 50% 0}
+.place{position:relative;padding:6px}
+.ph{position:absolute;top:-8px;left:-12px;font-size:28px;line-height:1}
+.ban{position:absolute;inset:-5px;border:4px solid #D64545;border-radius:50%;opacity:0}
+.ban::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:4px;background:#D64545;transform:translateX(-50%) rotate(45deg)}
+.star-dot{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:.7}
+.orbit{position:absolute;border-radius:50%;border:1.5px dashed}
+.orbit-rot{position:absolute}
+
 /* question list panel */
 .qindex{position:fixed;top:0;bottom:0;right:0;width:340px;background:var(--card);border-inline-end:1px solid #DCE5EB;box-shadow:-2px 0 0 rgba(0,0,0,0);display:flex;flex-direction:column;z-index:15}
 .qi-head{padding:14px 14px 10px;border-bottom:1px solid #E6EDF2;display:grid;gap:10px;background:#FBFDFE}
@@ -350,6 +383,23 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
   <div class="qwrap"><div class="qcard" id="qcard"></div></div>
 </section>
 
+<!-- WATCH AND LEARN -->
+<section id="learn" class="hidden">
+  <div class="qtop"><div class="qtop-in">
+    <button class="x" id="quitLearn" type="button" aria-label="العودة إلى الخريطة">✕</button>
+    <div style="flex:1;font-weight:800;font-size:20px">🎬 شاهد وتعلّم</div>
+    <div class="qcount" id="exCount"></div>
+  </div></div>
+  <div class="qwrap"><div class="qcard">
+    <div class="qhead"><span class="tag" id="exTitle"></span><span class="page-ref" id="exPage"></span></div>
+    <div class="ex-stage" id="exStage"></div>
+    <div class="ex-cap" id="exCap" role="status"></div>
+    <div class="ex-btns" id="exBtns"></div>
+    <div class="browse-nav"><button class="btn ghost" type="button" id="exPrev">→ الشرح السابق</button><button class="btn" type="button" id="exNext"></button></div>
+    <div style="text-align:center;margin-top:10px"><button class="linkbtn" type="button" id="exSkip"></button></div>
+  </div></div>
+</section>
+
 <!-- GAMES HUB -->
 <section id="games" class="hidden">
   <div class="band"><div class="band-in">
@@ -410,6 +460,8 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
 
 <!-- الأسئلة موجودة في ملف data.js -->
 <script src="data.js"></script>
+<!-- الشروحات المتحركة موجودة في ملف explain.js -->
+<script src="explain.js"></script>
 <script>
 (function(){
 "use strict";
@@ -455,7 +507,7 @@ function setUnitColors(u){
   r.setProperty("--u", u.color); r.setProperty("--u-deep", u.deep); r.setProperty("--u-soft", u.soft);
 }
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
-function show(id){ ["home","unit","quiz","result","games","game"].forEach(s=>$("#"+s).classList.toggle("hidden", s!==id)); window.scrollTo(0,0); }
+function show(id){ if(id!=="learn" && typeof exStop==="function") exStop(); ["home","unit","quiz","result","games","game","learn"].forEach(s=>$("#"+s).classList.toggle("hidden", s!==id)); window.scrollTo(0,0); }
 function starsFor(pct){ return pct>=90?3:pct>=70?2:pct>=50?1:0; }
 const GAME_LIST=[["memory","بطاقات الذاكرة","اقلب البطاقات وطابق الكلمة مع معناها"],["opposites","وصّل الأضداد","اربط كل كلمة بضدها"],["sentences","رتّب الجملة","رتّب الكلمات لتكوّن جملة من الدرس"],["letters","الحرف الناقص","اختر الحرف الصحيح لإكمال الكلمة"],["race","سباق التصنيف","صنّف الكلمات قبل أن ينتهي الوقت"]];
 const gameStars=u=>GAMES[u.id]?GAME_LIST.reduce((t,g)=>t+(S.best["g"+u.id+"-"+g[0]]||0),0):0;
@@ -544,6 +596,7 @@ function openUnit(id){
     return `<button class="stop ${open?'':'locked'} ${done?'done':''}" type="button" data-st="${i}" ${open?'':'aria-disabled="true"'}>
       <span class="node">${svgIcon(open?s.icon:'lock')}</span>
       <span class="stop-info"><small>المحطة ${AR(i+1)} · ${s.sub}</small><b>${s.title}</b>
+      ${(EXPLAIN_FOR[s.id]||[]).length?`<small class="ex-badge">🎬 شرح متحرك</small>`:""}
       ${s.img?`<img class="stop-img" src="${s.img}" alt="" loading="lazy">`:""}
       ${done? starsRow(S.best[s.id]||0) : `<small>${open? AR(s.qs.length)+' سؤالًا · '+G('ابدأ','ابدئي')+' الآن':'تُفتح بعد المحطة السابقة'}</small>`}</span></button>`;
   }).join("") + (GAMES[u.id]? `<button class="stop games-stop" type="button" data-games="1">
@@ -572,7 +625,7 @@ $("#stops").addEventListener("click", e=>{
   if(e.target.closest("[data-games]")) return openGames(curUnit);
   const b=e.target.closest("[data-st]"); if(!b) return; const i=+b.dataset.st;
   if(!isOpen(curUnit,i)){ b.animate && b.animate([{transform:"translateX(0)"},{transform:"translateX(-8px)"},{transform:"translateX(8px)"},{transform:"translateX(0)"}],{duration:300}); return; }
-  startStation(curUnit, i);
+  openLearn(curUnit, i);
 });
 $("#unitReview").addEventListener("click", ()=>startReview(curUnit));
 
@@ -718,6 +771,56 @@ function confetti(){
 function soundLabel(){ $("#soundBtn").textContent = S.sound ? "🔊 الصوت يعمل" : "🔇 الصوت متوقف"; }
 $("#soundBtn").addEventListener("click", ()=>{ S.sound=!S.sound; save(); soundLabel(); });
 soundLabel();
+/* ---------- WATCH AND LEARN ---------- */
+let L=null, exT=[], exA=[];
+const reducedMotion = ()=> window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function exStop(){ exT.forEach(clearTimeout); exT=[]; exA.forEach(a=>{try{a.cancel()}catch(e){}}); exA=[]; }
+function exHelpers(stage, ex){
+  const red = reducedMotion();
+  const h = {
+    stage, state:{},
+    q: sel=>stage.querySelector(sel),
+    cap: t=>{ $("#exCap").textContent=t; },
+    tone: seq=>tone(seq),
+    later: (fn,ms)=>{ exT.push(setTimeout(fn,ms)); },
+    pop(el,delay){ if(!el) return; el.style.opacity=0; el.style.transformBox="fill-box"; el.style.transformOrigin="center";
+      h.later(()=>{ el.style.opacity=1; if(!red) exA.push(el.animate([{transform:"scale(0)",opacity:0},{transform:"scale(1.2)",opacity:1,offset:.7},{transform:"scale(1)",opacity:1}],{duration:450,easing:"ease-out"})); }, delay||0); },
+    move(el,kf,dur,delay=0,easing="ease-in-out",iter=1){ if(!el) return;
+      if(red){ const last=Object.assign({},kf[kf.length-1]); delete last.offset; Object.assign(el.style,last); return; }
+      exA.push(el.animate(kf,{duration:dur,delay,easing,iterations:iter,fill:"both"})); },
+    run(name){ ex[name](h); }
+  };
+  return h;
+}
+function openLearn(u,i,idx){
+  const st=u.stations[i]; L={u,i,list:EXPLAIN_FOR[st.id]||[],idx:idx||0};
+  if(!L.list.length) return startStation(u,i);
+  setUnitColors(u); show("learn"); renderLearn();
+}
+function renderLearn(){
+  exStop();
+  const id=L.list[L.idx], ex=EXPLAIN[id], st=L.u.stations[L.i];
+  $("#exCount").textContent=`${AR(L.idx+1)} / ${AR(L.list.length)}`;
+  $("#exTitle").textContent=ex.t; $("#exPage").textContent=`كتاب لغتي · صفحة ${AR(ex.p)}`;
+  const stage=$("#exStage"); stage.innerHTML=ex.html; $("#exCap").textContent=ex.cap||"";
+  const h=exHelpers(stage,ex); L.h=h;
+  $("#exBtns").innerHTML=(ex.btns||[]).map(([lab,fn])=>`<button type="button" data-fn="${fn}">${lab}</button>`).join("")+`<button type="button" data-fn="__replay">↻ ${G("أعد","أعيدي")} الشرح</button>`;
+  $("#exPrev").style.visibility = L.idx>0 ? "visible":"hidden";
+  $("#exNext").textContent = L.idx<L.list.length-1 ? "الشرح التالي ←" : "ابدأ الأسئلة ←";
+  $("#exSkip").textContent = `${G("تخطَّ","تخطَّي")} الشرح وابدأ الأسئلة`;
+  $("#exSkip").style.display = L.idx<L.list.length-1 ? "" : "none";
+  setTimeout(()=>{ if(L && L.list[L.idx]===id) ex.play(h); },250);
+}
+$("#exBtns").addEventListener("click", e=>{
+  const b=e.target.closest("[data-fn]"); if(!b||!L) return; const fn=b.dataset.fn;
+  if(fn==="__replay") return renderLearn();
+  exT.forEach(clearTimeout); exT=[]; EXPLAIN[L.list[L.idx]][fn](L.h);
+});
+$("#exPrev").addEventListener("click", ()=>{ if(L.idx>0){ L.idx--; renderLearn(); } });
+$("#exNext").addEventListener("click", ()=>{ if(L.idx<L.list.length-1){ L.idx++; renderLearn(); } else { exStop(); startStation(L.u,L.i); } });
+$("#exSkip").addEventListener("click", ()=>{ exStop(); startStation(L.u,L.i); });
+$("#quitLearn").addEventListener("click", ()=>{ exStop(); openUnit(L.u.id); });
+
 /* ---------- QUESTION LIST ---------- */
 const strip = t => String(t).replace(/[ً-ْٰـ]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي");
 let qiFilter="all";
@@ -738,7 +841,8 @@ function buildIndex(){
         return `<button class="qi-q" type="button" data-sid="${st.id}" data-idx="${idx}"><span class="mk ${status}">${status==="ok"?"✓":status==="no"?"✗":""}</span><span class="n">${AR(idx+1)}</span><span class="t">${q.img?"🖼️ ":""}${text}</span></button>`;
       }).join("");
       if(!rows) return "";
-      return `<details class="qi-st" ${term||qiFilter!=="all"?"open":""}><summary>${st.title}<span class="cnt">${AR(st.qs.length)}</span></summary>${rows}</details>`;
+      const exs=(EXPLAIN_FOR[st.id]||[]); const exRow = (exs.length && !term && qiFilter==="all") ? `<button class="qi-game" type="button" data-learn="${st.id}">🎬 شاهد وتعلّم (${AR(exs.length)})</button>` : "";
+      return `<details class="qi-st" ${term||qiFilter!=="all"?"open":""}><summary>${st.title}<span class="cnt">${AR(st.qs.length)}</span></summary>${exRow}${rows}</details>`;
     }).join("");
     const games = (!term && qiFilter==="all" && GAMES[u.id]) ? `<details class="qi-st"><summary>🎮 ألعاب الوحدة<span class="cnt">${AR(GAME_LIST.length)}</span></summary>${GAME_LIST.map(([k,name])=>`<button class="qi-game" type="button" data-unit="${u.id}" data-game="${k}">${GI[k]} ${name}</button>`).join("")}</details>` : "";
     if(!sts && !games) return "";
@@ -771,6 +875,8 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape") qiToggle(false); 
 $("#qiSearch").addEventListener("input", buildIndex);
 document.querySelector(".qi-filters").addEventListener("click", e=>{ const b=e.target.closest("[data-f]"); if(!b) return; qiFilter=b.dataset.f; document.querySelectorAll(".qi-filters button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); buildIndex(); });
 $("#qiList").addEventListener("click", e=>{
+  const lb=e.target.closest("[data-learn]");
+  if(lb){ const u=UNITS.find(u=>u.stations.some(s=>s.id===lb.dataset.learn)); clearInterval(gTimer); openLearn(u, u.stations.findIndex(s=>s.id===lb.dataset.learn)); qiToggle(false); return; }
   const q=e.target.closest(".qi-q"), g=e.target.closest(".qi-game");
   if(q){ openOne(q.dataset.sid, +q.dataset.idx); qiToggle(false); }
   if(g){ clearInterval(gTimer); gUnit=UNITS.find(u=>u.id===+g.dataset.unit); setUnitColors(gUnit); startGame(g.dataset.game); qiToggle(false); }

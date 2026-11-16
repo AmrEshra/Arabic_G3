@@ -167,6 +167,53 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
 .home-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .home-tools button{font-size:14px;color:var(--muted);border:1.5px solid #D7E2E9;border-radius:99px;padding:4px 12px;background:var(--card)}
 
+/* question list panel */
+.qindex{position:fixed;top:0;bottom:0;right:0;width:340px;background:var(--card);border-inline-end:1px solid #DCE5EB;box-shadow:-2px 0 0 rgba(0,0,0,0);display:flex;flex-direction:column;z-index:15}
+.qi-head{padding:14px 14px 10px;border-bottom:1px solid #E6EDF2;display:grid;gap:10px;background:#FBFDFE}
+.qi-title{display:flex;justify-content:space-between;align-items:center;font-size:19px}
+.qi-close{display:none;width:36px;height:36px;border-radius:10px;border:2px solid #D7E2E9;font-size:18px}
+.qi-search input{width:100%;font:inherit;font-size:16px;border:2px solid #D7E2E9;border-radius:12px;padding:7px 12px;background:#fff}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.qi-filters{display:flex;gap:6px}
+.qi-filters button{flex:1;font-size:14px;font-weight:700;border:2px solid #D7E2E9;border-radius:99px;padding:4px 6px;background:#fff}
+.qi-filters button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.qi-sum{font-size:13px;color:var(--muted)}
+.qi-list{overflow-y:auto;flex:1;padding:6px 8px 40px;overscroll-behavior:contain}
+.qi-unit{margin:6px 0}
+.qi-unit > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;font-weight:800;font-size:16px;color:#fff;background:var(--c)}
+.qi-unit > summary::-webkit-details-marker,.qi-st > summary::-webkit-details-marker{display:none}
+.qi-unit > summary::before,.qi-st > summary::before{content:"◂";transition:transform .15s;font-size:13px}
+.qi-unit[open] > summary::before,.qi-st[open] > summary::before{transform:rotate(-90deg)}
+.qi-st{margin:4px 0 4px 0;padding-inline-start:6px}
+.qi-st > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px;font-weight:700;font-size:15px}
+.qi-st > summary:hover{background:#F1F6F9}
+.qi-st > summary .cnt{margin-inline-start:auto;font-size:12px;color:var(--muted);font-weight:500}
+.qi-q{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:right;padding:6px 8px;border-radius:10px;font-family:var(--read);font-size:15px;line-height:1.6}
+.qi-q:hover{background:#F1F6F9}
+.qi-q.cur{background:var(--u-soft);outline:2px solid var(--u)}
+.qi-q .n{flex:0 0 auto;font-family:var(--display);color:var(--muted);font-size:13px;min-width:20px;padding-top:2px}
+.qi-q .t{flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.qi-q .mk{flex:0 0 auto;width:20px;height:20px;border-radius:50%;border:2px solid #CBD6DE;display:grid;place-items:center;font-size:12px;font-family:var(--display);margin-top:3px}
+.qi-q .mk.ok{background:var(--good);border-color:var(--good);color:#fff}
+.qi-q .mk.no{background:var(--bad);border-color:var(--bad);color:#fff}
+.qi-game{display:flex;gap:8px;align-items:center;width:100%;text-align:right;padding:6px 8px;border-radius:10px;font-size:15px;font-weight:700}
+.qi-game:hover{background:#FFF4E5}
+.qi-empty{color:var(--muted);text-align:center;padding:20px 8px;font-size:15px}
+.qi-open{display:none}
+.qi-shade{position:fixed;inset:0;background:rgba(15,25,45,.4);z-index:14}
+.browse-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+@media (min-width:1101px){
+  body{padding-right:340px}
+  .qi-shade{display:none !important}
+}
+@media (max-width:1100px){
+  .qindex{width:min(360px,88vw);transform:translateX(105%);transition:transform .25s;box-shadow:-8px 0 30px rgba(0,0,0,.2)}
+  .qindex.on{transform:none}
+  .qi-close{display:grid;place-items:center}
+  .qi-open{display:block;position:fixed;bottom:16px;right:16px;z-index:13;background:var(--ink);color:#fff;border-radius:99px;padding:10px 18px;font-weight:800;font-size:16px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .qwrap,.wrap{padding-bottom:84px}
+}
+
 /* images */
 .unit-top{display:flex;justify-content:space-between;gap:12px}
 .unit-top > div{position:relative;z-index:1}
@@ -337,6 +384,23 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
   </form>
 </div>
 
+<!-- QUESTION LIST (right side) -->
+<button class="qi-open" id="qiOpen" type="button" aria-controls="qindex">📋 كل الأسئلة</button>
+<div class="qi-shade hidden" id="qiShade"></div>
+<aside class="qindex" id="qindex" aria-label="قائمة كل الأسئلة">
+  <div class="qi-head">
+    <div class="qi-title"><b>📋 كل الأسئلة</b><button class="qi-close" id="qiClose" type="button" aria-label="إغلاق القائمة">✕</button></div>
+    <label class="qi-search"><span class="sr">بحث في الأسئلة</span><input id="qiSearch" type="search" placeholder="ابحث في الأسئلة…" autocomplete="off"></label>
+    <div class="qi-filters" role="group" aria-label="تصفية الأسئلة">
+      <button type="button" data-f="all" aria-pressed="true">الكل</button>
+      <button type="button" data-f="wrong" aria-pressed="false">أخطائي</button>
+      <button type="button" data-f="new" aria-pressed="false">لم أجربها</button>
+    </div>
+    <div class="qi-sum" id="qiSum"></div>
+  </div>
+  <div class="qi-list" id="qiList"></div>
+</aside>
+
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <!-- الأسئلة موجودة في ملف data.js -->
@@ -352,8 +416,9 @@ const T = str => String(str).replace(/\{ي\}/g, S.gender==="m" ? "" : "ي");
 
 /* ---------- saved progress (this browser only) ---------- */
 const KEY = "lughati-g3-p1";
-let S = {name:"", gender:"", best:{}, done:{}, wrong:{}, sound:true};
+let S = {name:"", gender:"", best:{}, done:{}, wrong:{}, ans:{}, sound:true};
 try{ const raw = localStorage.getItem(KEY); if(raw) S = Object.assign(S, JSON.parse(raw)); }catch(e){}
+S.ans = S.ans || {};
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 
 /* ---------- icons ---------- */
@@ -442,7 +507,7 @@ $("#reviewAll").addEventListener("click", ()=>startReview(null));
 $("#editName").addEventListener("click", askName);
 $("#resetBtn").addEventListener("click", ()=>{
   const b=$("#resetBtn");
-  if(b.dataset.sure){ S.best={}; S.done={}; S.wrong={}; save(); b.textContent="مسح التقدم والبدء من جديد"; delete b.dataset.sure; renderHome(); }
+  if(b.dataset.sure){ S.best={}; S.done={}; S.wrong={}; S.ans={}; save(); buildIndex(); b.textContent="مسح التقدم والبدء من جديد"; delete b.dataset.sure; renderHome(); }
   else { b.dataset.sure="1"; b.textContent=G("اضغط","اضغطي")+" مرة أخرى لتأكيد المسح"; setTimeout(()=>{ if(b.dataset.sure){delete b.dataset.sure; b.textContent="مسح التقدم والبدء من جديد";} },4000); }
 });
 
@@ -459,7 +524,7 @@ $("#nameForm").addEventListener("submit", e=>{
   e.preventDefault();
   if(!pickedG){ $("#gErr").classList.remove("hidden"); return; }
   S.gender = pickedG; S.name = $("#nameInput").value.trim().slice(0,20); save();
-  $("#nameModal").classList.add("hidden"); renderHome();
+  $("#nameModal").classList.add("hidden"); renderHome(); buildIndex();
 });
 
 /* ---------- UNIT MAP ---------- */
@@ -529,6 +594,7 @@ function renderQ(){
   if(Q.review && item.u) setUnitColors(item.u);
   $("#qbar").style.width = (Q.i/Q.list.length*100)+"%";
   $("#qcount").textContent = `${AR(Q.i+1)} / ${AR(Q.list.length)}`;
+  qiCurrent(item.sid, item.idx);
   const st = (item.u||Q.unit).stations.find(s=>s.id===item.sid);
   const pic = q.img ? `<img class="qimg" src="${q.img}" alt="صورة من كتاب لغتي">` : "";
   const head = pic + `<div class="qhead"><span class="tag">${Q.review?'مراجعة · ':''}${st.title}</span><span class="page-ref">كتاب لغتي · صفحة ${AR(q.p)}</span></div>`;
@@ -544,11 +610,14 @@ function renderQ(){
       <div class="buckets">${q.groups.map((g,k)=>`<button class="bucket" type="button" data-b="${k}"><span class="bname">${g}</span><span class="chips" id="chips${k}"></span></button>`).join("")}</div>
       <div class="sort-hint">${G("اضغط","اضغطي")} على المجموعة المناسبة للكلمة</div>`;
   }
-  $("#qcard").innerHTML = head + body + `<div id="fb"></div>`;
+  const nav = Q.browse ? `<div class="browse-nav"><button class="btn ghost" type="button" id="bPrev" ${Q.i===0?'disabled style="opacity:.45"':''}>→ السؤال السابق</button><button class="btn" type="button" id="bNext">${Q.i===Q.list.length-1?'العودة إلى المحطة':'السؤال التالي ←'}</button></div>` : "";
+  $("#qcard").innerHTML = head + body + `<div id="fb"></div>` + nav;
   if(q.t==="sort") nextSortWord(item);
   $("#qcard").onclick = e=>{
     const b=e.target.closest("button"); if(!b||b.disabled) return;
     if(b.id==="nextBtn") return goNext();
+    if(b.id==="bPrev"){ Q.i--; renderQ(); return window.scrollTo(0,0); }
+    if(b.id==="bNext"){ if(Q.i<Q.list.length-1){ Q.i++; renderQ(); window.scrollTo(0,0); } else openUnit(Q.unit.id); return; }
     if(q.t==="mcq" && b.dataset.k!==undefined) answerChoice(+b.dataset.k===q.a, b, ()=>[...document.querySelectorAll(".opt")].find(x=>+x.dataset.k===q.a));
     if(q.t==="tf" && b.dataset.tf!==undefined) answerChoice((b.dataset.tf==="1")===q.a, b, ()=>[...document.querySelectorAll(".opt")].find(x=>(x.dataset.tf==="1")===q.a));
     if(q.t==="sort" && b.dataset.b!==undefined) sortPick(item, +b.dataset.b);
@@ -584,11 +653,11 @@ function finish(ok){
   // update saved mistake list
   const arr = new Set(S.wrong[item.sid]||[]);
   ok ? arr.delete(item.idx) : arr.add(item.idx);
-  S.wrong[item.sid]=[...arr]; save();
+  S.wrong[item.sid]=[...arr]; S.ans[item.sid+"-"+item.idx]=ok; save(); qiMark(item.sid, item.idx);
   const pick = a=>a[Math.floor(Math.random()*a.length)];
   const last = Q.i===Q.list.length-1;
   $("#fb").innerHTML = `<div class="feedback ${ok?'good':'bad'}" role="status"><b>${ok?pick(PRAISE()):pick(TRY())}</b><p>${q.e}</p><span class="src">📖 ${G("راجع","راجعي")} كتاب لغتي صفحة ${AR(q.p)}</span></div>
-    <div class="next-row"><button class="btn" id="nextBtn" type="button">${last?'عرض النتيجة':'السؤال التالي ←'}</button></div>`;
+    ${Q.browse? "" : `<div class="next-row"><button class="btn" id="nextBtn" type="button">${last?'عرض النتيجة':'السؤال التالي ←'}</button></div>`}`;
   $("#qbar").style.width = ((Q.i+1)/Q.list.length*100)+"%";
   setTimeout(()=>{ const n=$("#nextBtn"); if(n){ n.focus({preventScroll:true}); n.scrollIntoView({block:"nearest",behavior:"smooth"}); } },60);
 }
@@ -644,6 +713,67 @@ function confetti(){
 function soundLabel(){ $("#soundBtn").textContent = S.sound ? "🔊 الصوت يعمل" : "🔇 الصوت متوقف"; }
 $("#soundBtn").addEventListener("click", ()=>{ S.sound=!S.sound; save(); soundLabel(); });
 soundLabel();
+/* ---------- QUESTION LIST ---------- */
+const strip = t => String(t).replace(/[ً-ْٰـ]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي");
+let qiFilter="all";
+function qiStatus(sid,idx){ const v=S.ans[sid+"-"+idx]; if((S.wrong[sid]||[]).includes(idx)) return "no"; return v===true?"ok":v===false?"no":""; }
+function buildIndex(){
+  const term = strip($("#qiSearch").value.trim());
+  let shown=0, total=0;
+  const html = UNITS.map(u=>{
+    const sts = u.stations.map(st=>{
+      const rows = st.qs.map((q,idx)=>{
+        total++;
+        const status=qiStatus(st.id,idx);
+        if(qiFilter==="wrong" && status!=="no") return "";
+        if(qiFilter==="new" && status) return "";
+        const text=T(q.q).replace(/<[^>]+>/g,"");
+        if(term && !strip(text+" "+(q.o||[]).join(" ")).includes(term)) return "";
+        shown++;
+        return `<button class="qi-q" type="button" data-sid="${st.id}" data-idx="${idx}"><span class="mk ${status}">${status==="ok"?"✓":status==="no"?"✗":""}</span><span class="n">${AR(idx+1)}</span><span class="t">${q.img?"🖼️ ":""}${text}</span></button>`;
+      }).join("");
+      if(!rows) return "";
+      return `<details class="qi-st" ${term||qiFilter!=="all"?"open":""}><summary>${st.title}<span class="cnt">${AR(st.qs.length)}</span></summary>${rows}</details>`;
+    }).join("");
+    const games = (!term && qiFilter==="all" && GAMES[u.id]) ? `<details class="qi-st"><summary>🎮 ألعاب الوحدة<span class="cnt">${AR(GAME_LIST.length)}</span></summary>${GAME_LIST.map(([k,name])=>`<button class="qi-game" type="button" data-unit="${u.id}" data-game="${k}">${GI[k]} ${name}</button>`).join("")}</details>` : "";
+    if(!sts && !games) return "";
+    return `<details class="qi-unit" style="--c:${u.color}" ${term||qiFilter!=="all"?"open":""} data-u="${u.id}"><summary>الوحدة ${["","الأولى","الثانية","الثالثة","الرابعة","الخامسة","السادسة","السابعة","الثامنة"][u.id]}: ${u.title}</summary>${sts}${games}</details>`;
+  }).join("");
+  $("#qiList").innerHTML = html || `<div class="qi-empty">لا توجد أسئلة مطابقة.</div>`;
+  const nOk=Object.values(S.ans).filter(v=>v===true).length, nWrong=allWrong();
+  $("#qiSum").textContent = (term||qiFilter!=="all") ? `${AR(shown)} سؤالًا مطابقًا` : `${AR(total)} سؤالًا · ✓ ${AR(nOk)} صحيحة · ✗ ${AR(nWrong)} للمراجعة`;
+}
+function qiMark(sid,idx){
+  const el=document.querySelector(`.qi-q[data-sid="${sid}"][data-idx="${idx}"] .mk`); if(!el) return;
+  const st=qiStatus(sid,idx); el.className="mk "+st; el.textContent= st==="ok"?"✓":st==="no"?"✗":"";
+  const nOk=Object.values(S.ans).filter(v=>v===true).length;
+  if(!$("#qiSearch").value && qiFilter==="all") $("#qiSum").textContent=`${AR(UNITS.reduce((t,u)=>t+u.stations.reduce((a,s)=>a+s.qs.length,0),0))} سؤالًا · ✓ ${AR(nOk)} صحيحة · ✗ ${AR(allWrong())} للمراجعة`;
+}
+function qiCurrent(sid,idx){
+  document.querySelectorAll(".qi-q.cur").forEach(x=>x.classList.remove("cur"));
+  const el=document.querySelector(`.qi-q[data-sid="${sid}"][data-idx="${idx}"]`); if(!el) return;
+  el.classList.add("cur"); let d=el.parentElement; while(d && d!==$("#qiList")){ if(d.tagName==="DETAILS") d.open=true; d=d.parentElement; }
+  el.scrollIntoView({block:"nearest"});
+}
+function qiToggle(on){ $("#qindex").classList.toggle("on",on); $("#qiShade").classList.toggle("hidden",!on); if(on) setTimeout(()=>$("#qiSearch").focus({preventScroll:true}),260); }
+$("#qiOpen").addEventListener("click", ()=>qiToggle(true));
+$("#qiClose").addEventListener("click", ()=>qiToggle(false));
+$("#qiShade").addEventListener("click", ()=>qiToggle(false));
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") qiToggle(false); });
+$("#qiSearch").addEventListener("input", buildIndex);
+document.querySelector(".qi-filters").addEventListener("click", e=>{ const b=e.target.closest("[data-f]"); if(!b) return; qiFilter=b.dataset.f; document.querySelectorAll(".qi-filters button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); buildIndex(); });
+$("#qiList").addEventListener("click", e=>{
+  const q=e.target.closest(".qi-q"), g=e.target.closest(".qi-game");
+  if(q){ openOne(q.dataset.sid, +q.dataset.idx); qiToggle(false); }
+  if(g){ clearInterval(gTimer); gUnit=UNITS.find(u=>u.id===+g.dataset.unit); setUnitColors(gUnit); startGame(g.dataset.game); qiToggle(false); }
+});
+function openOne(sid, idx){
+  clearInterval(gTimer);
+  const u=UNITS.find(u=>u.stations.some(s=>s.id===sid)); const st=u.stations.find(s=>s.id===sid);
+  Q={unit:u, st:u.stations.indexOf(st), review:false, browse:true, list:st.qs.map((q,i)=>({q,sid,idx:i})), i:idx, right:0, wrongNow:[]};
+  setUnitColors(u); show("quiz"); renderQ();
+}
+
 /* ---------- GAMES ---------- */
 let gUnit=null, gCur=null, gTimer=null;
 const tries=n=> n===1?"محاولة واحدة": n===2?"محاولتان": n<=10? `${AR(n)} محاولات` : `${AR(n)} محاولة`;
@@ -789,6 +919,7 @@ function gRace(data){
 
 /* ---------- start ---------- */
 renderHome();
+buildIndex();
 if(!S.gender) askName();
 })();
 </script>

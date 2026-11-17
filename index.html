@@ -91,9 +91,12 @@ h1,h2,h3{margin:0;line-height:1.25;text-wrap:balance}
 .map{position:relative;max-width:560px;margin:10px auto 0}
 .map svg.path{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .stops{position:relative;display:grid;gap:26px;padding:16px 0}
-.stop{display:flex;align-items:center;gap:14px;width:78%}
-.stop:nth-child(odd){margin-inline-start:0}
-.stop:nth-child(even){margin-inline-start:22%;flex-direction:row}
+.stop-wrap{position:relative;width:78%}
+.stop-wrap:nth-child(even){margin-inline-start:22%}
+.stop-wrap.has-ex{padding-bottom:20px}
+.stop{display:flex;align-items:center;gap:14px;width:100%}
+.ex-go{position:absolute;bottom:0;right:114px;background:#FFF4E5;color:#B5520F;border:2px solid #F2B866;border-radius:99px;padding:3px 14px;font-size:14px;font-weight:800;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.ex-go:hover{background:#FFE9CC;border-color:#F06331}
 .node{flex:0 0 auto;width:86px;height:86px;border-radius:50%;background:var(--u);color:#fff;display:grid;place-items:center;box-shadow:0 6px 0 var(--u-deep);position:relative;transition:transform .15s}
 .node svg{width:40px;height:40px}
 .stop:hover .node{transform:scale(1.05)}
@@ -324,8 +327,9 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
   .units{grid-template-columns:1fr}
   .hero-in{grid-template-columns:1fr}
   .total{justify-self:start;grid-auto-flow:column;gap:10px;align-items:center}
-  .stop{width:100%}
-  .stop:nth-child(even){margin-inline-start:0}
+  .stop-wrap{width:100%}
+  .stop-wrap:nth-child(even){margin-inline-start:0}
+  .ex-go{right:100px}
   .node{width:72px;height:72px}
   .node svg{width:34px;height:34px}
   .unit-title{font-size:24px}
@@ -599,16 +603,17 @@ function openUnit(id){
   $("#unitTitle").textContent = u.title;
   $("#stops").innerHTML = u.stations.map((s,i)=>{
     const open=isOpen(u,i), done=!!S.done[s.id];
-    return `<button class="stop ${open?'':'locked'} ${done?'done':''}" type="button" data-st="${i}" ${open?'':'aria-disabled="true"'}>
+    const hasEx=(EXPLAIN_FOR[s.id]||[]).length;
+    return `<div class="stop-wrap ${hasEx?'has-ex':''}"><button class="stop ${open?'':'locked'} ${done?'done':''}" type="button" data-st="${i}" ${open?'':'aria-disabled="true"'}>
       <span class="node">${svgIcon(open?s.icon:'lock')}</span>
       <span class="stop-info"><small>المحطة ${AR(i+1)} · ${s.sub}</small><b>${s.title}</b>
-      ${(EXPLAIN_FOR[s.id]||[]).length?`<small class="ex-badge">🎬 شرح متحرك</small>`:""}
       ${s.img?`<img class="stop-img" src="${s.img}" alt="" loading="lazy">`:""}
-      ${done? starsRow(S.best[s.id]||0) : `<small>${open? AR(s.qs.length)+' سؤالًا · '+G('ابدأ','ابدئي')+' الآن':'تُفتح بعد المحطة السابقة'}</small>`}</span></button>`;
-  }).join("") + (GAMES[u.id]? `<button class="stop games-stop" type="button" data-games="1">
+      ${done? starsRow(S.best[s.id]||0) : `<small>${open? AR(s.qs.length)+' سؤالًا · '+G('ابدأ','ابدئي')+' الآن':'تُفتح بعد المحطة السابقة'}</small>`}</span></button>
+      ${hasEx?`<button class="ex-go" type="button" data-exp="${i}">🎬 ${G("شاهد","شاهدي")} الشرح المتحرك</button>`:""}</div>`;
+  }).join("") + (GAMES[u.id]? `<div class="stop-wrap"><button class="stop games-stop" type="button" data-games="1">
       <span class="node">${svgIcon('game')}</span>
       <span class="stop-info"><small>المحطة ${AR(u.stations.length+1)} · ساحة الألعاب</small><b>ألعاب الوحدة</b>
-      ${starsRow(Math.round(gameStars(u)/(GAME_LIST.length*3)*3))} <small>${AR(gameStars(u))}/${AR(GAME_LIST.length*3)} نجمة</small></span></button>`:"");
+      ${starsRow(Math.round(gameStars(u)/(GAME_LIST.length*3)*3))} <small>${AR(gameStars(u))}/${AR(GAME_LIST.length*3)} نجمة</small></span></button></div>`:"");
   $("#mapCover").innerHTML = u.cover? `<img src="${u.cover}" alt="غلاف الوحدة من كتاب لغتي">` : "";
   const w = wrongCount(u), ub=$("#unitReview");
   ub.innerHTML = w? `${G("راجع","راجعي")} أخطاء هذه الوحدة (${AR(w)})` : "لا توجد أخطاء في هذه الوحدة";
@@ -628,10 +633,11 @@ function drawPath(){
 window.addEventListener("resize", ()=>{ if(!$("#unit").classList.contains("hidden")) drawPath(); });
 $("#unitBack").addEventListener("click", renderHome);
 $("#stops").addEventListener("click", e=>{
+  const ex=e.target.closest("[data-exp]"); if(ex) return openLearn(curUnit, +ex.dataset.exp);
   if(e.target.closest("[data-games]")) return openGames(curUnit);
   const b=e.target.closest("[data-st]"); if(!b) return; const i=+b.dataset.st;
   if(!isOpen(curUnit,i)){ b.animate && b.animate([{transform:"translateX(0)"},{transform:"translateX(-8px)"},{transform:"translateX(8px)"},{transform:"translateX(0)"}],{duration:300}); return; }
-  openLearn(curUnit, i);
+  startStation(curUnit, i);
 });
 $("#unitReview").addEventListener("click", ()=>startReview(curUnit));
 
